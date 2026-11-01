@@ -1,5 +1,5 @@
-# Usar una imagen oficial de OpenJDK
-FROM openjdk:17-jdk-slim
+# Usar una imagen oficial y actualizada de OpenJDK (Eclipse Temurin)
+FROM eclipse-temurin:17-jdk-alpine
 
 # Directorio de trabajo dentro del contenedor
 WORKDIR /app
@@ -11,4 +11,4 @@ COPY build/libs/*.jar app.jar
 EXPOSE 8080
 
 # Comando para ejecutar la aplicación
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]s
