@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  app-calculo:
+    build: .
+    container_name: contenedor_calculo_planilla
+    ports:
+      - "8080:8080"
+    restart: always

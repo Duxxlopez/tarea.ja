@@ -20,4 +20,12 @@ public class CalculoService {
         }
         return 0.0;
     }
+
+    // Método para calcular el Valor Neto (Sueldo Base + Bonificación - Descuento del 8%)
+    public double calcularValorNeto(double sueldoBase, int horasExtras) {
+        double bonificacion = calcularBonificacionHorasExtras(horasExtras);
+        double descuento = calcularPorcentaje(sueldoBase);
+
+        return sueldoBase + bonificacion - descuento;
+    }
 }
