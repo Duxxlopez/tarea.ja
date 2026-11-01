@@ -7,8 +7,8 @@ WORKDIR /app
 # Copiar el archivo jar generado por Gradle al contenedor
 COPY build/libs/*.jar app.jar
 
-# Exponer el puerto 8080
-EXPOSE 8080
+# Exponer el puerto 8081
+EXPOSE 8081
 
 # Comando para ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]
