@@ -1,11 +1,12 @@
 package calculo.api.ejericicio;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/calculo")
+@RequestMapping("/api/ventas")
 public class CalculoController {
 
     private final CalculoService calculoService;
@@ -14,28 +15,57 @@ public class CalculoController {
         this.calculoService = calculoService;
     }
 
-    // Endpoint GET: Prueba rápida de verificación
-    @GetMapping("/ping")
-    public String status() {
-        return "API Calculo activa";
+    // 1. GET: Listar todas las ventas registradas
+    @GetMapping
+    public ResponseEntity<List<VentaResponse>> listarVentas() {
+        return ResponseEntity.ok(calculoService.listarTodas());
     }
 
-    // Endpoint POST: Recibe los datos y retorna el cálculo
-    @PostMapping("/procesar")
-    public Map<String, Object> procesarCalculo(@RequestBody Map<String, Object> datos) {
-        double monto = Double.parseDouble(datos.getOrDefault("monto", 0).toString());
-        int horasExtras = Integer.parseInt(datos.getOrDefault("horasExtras", 0).toString());
+    // 2. GET por ID: Consultar una venta específica (ej. /api/ventas/1)
+    @GetMapping("/{id}")
+    public ResponseEntity<?> obtenerVentaPorId(@PathVariable Long id) {
+        return calculoService.buscarPorId(id)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(404).body(Map.of("error", "Venta no encontrada")));
+    }
 
-        double retencion = calculoService.calcularPorcentaje(monto);
-        double bonificacion = calculoService.calcularBonificacionHorasExtras(horasExtras);
+    // 3. POST: Calcular y registrar una nueva venta (/api/ventas/calcular)
+    @PostMapping("/calcular")
+    public ResponseEntity<?> calcularVenta(@RequestBody VentaRequest request) {
+        try {
+            VentaResponse response = calculoService.calcularYGuardar(request);
+            return ResponseEntity.ok(response);
+        } catch (ValidacionException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 
-        Map<String, Object> respuesta = new HashMap<>();
-        respuesta.put("montoIngresado", monto);
-        respuesta.put("retencion8", retencion);
-        respuesta.put("horasExtras", horasExtras);
-        respuesta.put("bonificacion", bonificacion);
-        respuesta.put("totalFinal", monto - retencion + bonificacion);
+    // 4. PUT: Actualizar una venta existente por ID (ej. /api/ventas/1)
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarVenta(@PathVariable Long id, @RequestBody VentaRequest request) {
+        try {
+            VentaResponse response = calculoService.actualizar(id, request);
+            return ResponseEntity.ok(response);
+        } catch (ValidacionException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 
-        return respuesta;
+    // 5. DELETE: Eliminar una venta por ID (ej. /api/ventas/1)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarVenta(@PathVariable Long id) {
+        boolean eliminado = calculoService.eliminar(id);
+        if (eliminado) {
+            return ResponseEntity.ok(Map.of("mensaje", "Venta eliminada correctamente con ID: " + id));
+        } else {
+            return ResponseEntity.status(404).body(Map.of("error", "No se encontró la venta para eliminar"));
+        }
+    }
+    // 6. HEAD: Retorna solo las cabeceras y el estado (sin cuerpo) para verificar la API
+    @RequestMapping(method = RequestMethod.HEAD)
+    public ResponseEntity<?> manejarHead() {
+        return ResponseEntity.ok()
+                .header("X-Info-Api", "API Bodega Don Pepe Activa")
+                .build();
     }
 }
