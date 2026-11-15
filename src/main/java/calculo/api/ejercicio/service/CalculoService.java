@@ -1,6 +1,7 @@
 package calculo.api.ejercicio.service;
 
 import calculo.api.ejercicio.dto.request.VentaRequest;
+import calculo.api.ejercicio.dto.request.VentaPatchRequest;
 import calculo.api.ejercicio.dto.response.VentaResponse;
 import calculo.api.ejercicio.exception.ValidacionException;
 import calculo.api.ejercicio.exception.VentaNoEncontradaException;
@@ -51,6 +52,42 @@ public class CalculoService {
         }
         Venta venta = ventaRepository.save(calcular(request, id));
         return convertirARespuesta(venta);
+    }
+
+    public VentaResponse modificarParcialmente(Long id, VentaPatchRequest request) {
+        validarId(id);
+        if (request == null || (request.getProducto() == null && request.getMetodoPago() == null)) {
+            throw new ValidacionException("Envía al menos producto o metodoPago para modificar la venta.");
+        }
+
+        Venta venta = ventaRepository.findById(id)
+                .orElseThrow(() -> new VentaNoEncontradaException(id));
+
+        if (request.getProducto() != null) {
+            String producto = request.getProducto().trim();
+            if (producto.isEmpty()) {
+                throw new ValidacionException("El nombre del producto es obligatorio.");
+            }
+            if (producto.length() > 150) {
+                throw new ValidacionException("El nombre del producto no puede superar 150 caracteres.");
+            }
+            venta.setProducto(producto);
+        }
+
+        if (request.getMetodoPago() != null) {
+            String metodoPago = request.getMetodoPago().trim().toUpperCase();
+            if (!metodoPago.equals("TARJETA") && !metodoPago.equals("EFECTIVO")) {
+                throw new ValidacionException("El método de pago solo puede ser TARJETA o EFECTIVO.");
+            }
+            venta.setMetodoPago(metodoPago);
+            BigDecimal base = venta.getSubtotalConDescuento().add(venta.getIgv());
+            BigDecimal comision = metodoPago.equals("TARJETA")
+                    ? redondear(base.multiply(TASA_TARJETA)) : BigDecimal.ZERO;
+            venta.setComisionTarjeta(comision);
+            venta.setTotalFinal(redondear(base.add(comision)));
+        }
+
+        return convertirARespuesta(ventaRepository.save(venta));
     }
 
     public void eliminar(Long id) {

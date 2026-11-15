@@ -1,6 +1,7 @@
 package calculo.api.ejercicio.controller;
 
 import calculo.api.ejercicio.dto.request.VentaRequest;
+import calculo.api.ejercicio.dto.request.VentaPatchRequest;
 import calculo.api.ejercicio.dto.response.VentaResponse;
 import calculo.api.ejercicio.service.CalculoService;
 
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,6 +51,14 @@ public class CalculoController {
             @PathVariable Long id,
             @RequestBody(required = false) VentaRequest request) {
         return ResponseEntity.ok(calculoService.actualizar(id, request));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<VentaResponse> modificarVenta(
+            @PathVariable Long id,
+            @RequestBody(required = false) VentaPatchRequest request) {
+        VentaResponse venta = calculoService.modificarParcialmente(id, request);
+        return ResponseEntity.created(URI.create("/api/ventas/" + venta.getId())).body(venta);
     }
 
     @DeleteMapping("/{id}")
