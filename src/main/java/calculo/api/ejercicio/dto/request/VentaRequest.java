@@ -1,5 +1,16 @@
-package calculo.api.ejericicio;
+package calculo.api.ejercicio.dto.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class VentaRequest {
     private String producto;
     private int cantidad;

@@ -1,14 +1,24 @@
-# Usar una imagen oficial y actualizada de OpenJDK (Eclipse Temurin)
-FROM eclipse-temurin:17-jdk-alpine
-
-# Directorio de trabajo dentro del contenedor
+# --- ETAPA 1: Construcción (Build con Gradle global) ---
+FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
 
-# Copiar el archivo jar generado por Gradle al contenedor
-COPY build/libs/*.jar app.jar
+# Copiar archivos de configuración y código fuente
+COPY build.gradle settings.gradle ./
+COPY gradle ./gradle
+COPY src ./src
 
-# Exponer el puerto 8081
-EXPOSE 8081
+# Compilar usando gradle directamente
+RUN gradle bootJar --no-daemon
 
-# Comando para ejecutar la aplicación
+# --- ETAPA 2: Ejecución (Runtime ligero) ---
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+
+# Copiar el JAR compilado desde la primera etapa
+COPY --from=build /app/build/libs/*.jar app.jar
+
+# Exponer el puerto interno de Spring Boot
+EXPOSE 8080
+
+# Comando de inicio del contenedor
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,10 +1,12 @@
-package calculo.api.ejericicio;
+package calculo.api.ejercicio;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-class EjericicioApplicationTests {
+@ActiveProfiles("test")
+class CalculoApplicationTests {
 
 	@Test
 	void contextLoads() {
