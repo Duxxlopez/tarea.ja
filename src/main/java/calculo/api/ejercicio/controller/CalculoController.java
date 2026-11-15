@@ -1,4 +1,8 @@
-package calculo.api.ejericicio;
+package calculo.api.ejercicio.controller;
+
+import calculo.api.ejercicio.dto.request.VentaRequest;
+import calculo.api.ejercicio.dto.response.VentaResponse;
+import calculo.api.ejercicio.service.CalculoService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,9 +35,7 @@ public class CalculoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<VentaResponse> obtenerVentaPorId(@PathVariable Long id) {
-        return calculoService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(calculoService.buscarPorId(id));
     }
 
     @PostMapping("/calcular")
@@ -51,9 +53,7 @@ public class CalculoController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> eliminarVenta(@PathVariable Long id) {
-        if (!calculoService.eliminar(id)) {
-            return ResponseEntity.notFound().build();
-        }
+        calculoService.eliminar(id);
         return ResponseEntity.ok(Map.of("mensaje", "Venta eliminada correctamente con ID: " + id));
     }
 

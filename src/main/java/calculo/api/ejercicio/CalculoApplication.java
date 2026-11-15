@@ -1,13 +1,13 @@
-package calculo.api.ejericicio;
+package calculo.api.ejercicio;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class EjericicioApplication {
+public class CalculoApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EjericicioApplication.class, args);
+		SpringApplication.run(CalculoApplication.class, args);
 	}
 
 }

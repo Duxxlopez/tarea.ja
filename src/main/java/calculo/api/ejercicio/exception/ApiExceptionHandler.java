@@ -1,4 +1,4 @@
-package calculo.api.ejericicio;
+package calculo.api.ejercicio.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
